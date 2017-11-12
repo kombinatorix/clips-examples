@@ -84,4 +84,28 @@ CLIPS> (add-one-list-to-another ?list-one ?list-two)
 (2 0 2.0 0 -2 0.0 2.0 0.0 2.0)
 ```
 
+```CLIPS
+(deftemplate matrix
+    (slot number-of-rows (default ?NONE) (type INTEGER))
+    (slot number-of-columns (default ?NONE) (type INTEGER))
+    (multislot values (default ?NONE) (type NUMBER))
+    ;The matrix is written row-wise
+)
+
+(defrule dismiss-malformed-matrix
+   ?rmatrix <- (matrix (number-of-rows ?nor) (number-of-columns ?noc) (values $?vals))
+   (test (!= (* ?nor ?noc) (length $?vals)))
+=>
+   (retract ?rmatrix)
+   (printout t "Matrix was dismissed, because it had " (length $?vals) " values," crlf)
+   (printout t "but had to have " (* ?nor ?noc) " values."                        crlf)
+)
+
+(deffunction add-matrices (?matrix-one ?rows-one ?columns-one ?matrix-two ?rows-two ?columns-two)
+   (if (and (= ?rows-one ?rows-two) (= ?columns-one ?columns-two))
+       then (return (add-one-list-to-another ?matrix-one ?matrix-two))
+       else (printout t "The dimensions of the matrices differ" crlf)
+   )
+)
+```
 
